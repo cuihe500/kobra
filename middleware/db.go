@@ -7,6 +7,6 @@ import (
 
 func WithContextDb(ctx *gin.Context) {
 	db := tools.GetDBConnect()
-	ctx.Set("db", db)
+	ctx.Set("db", db.WithContext(ctx))
 	ctx.Next()
 }

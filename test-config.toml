@@ -7,4 +7,4 @@ host = "192.168.125.112"
 port = 43307
 username = "root"
 password = "Ch870219176!"
-database-name = "users"
+database_name = "users"

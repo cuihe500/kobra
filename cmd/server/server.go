@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/routers"
 	config2 "gitlab.eaip.top/gorm-gen-gin-learn-project/config"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/middleware"
 	"log/slog"
@@ -44,6 +45,7 @@ func startServer() {
 func StartMainServer() {
 	engine := gin.New()
 	middleware.InitMiddleware(engine)
+	routers.Get(engine)
 	srv := &http.Server{
 		Addr:    config2.SConfig.Host + ":" + config2.SConfig.Port,
 		Handler: engine,
