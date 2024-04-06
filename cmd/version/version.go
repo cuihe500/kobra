@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var VersionCmd = &cobra.Command{
+var VCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of kobra",
 	Long:  "All software has versions. This is kobra's",

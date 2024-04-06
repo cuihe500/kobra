@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/cmd/server"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/cmd/version"
 	"os"
 )
@@ -17,7 +18,8 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(version.VersionCmd)
+	rootCmd.AddCommand(version.VCmd)
+	rootCmd.AddCommand(server.SvrCmd)
 }
 
 func Execute() {
