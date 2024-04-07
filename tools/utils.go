@@ -6,19 +6,18 @@ import (
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log/slog"
 )
 
 const TrafficKey = "X-Request-Id"
 
-func GetDBConnect() *gorm.DB {
+func GetDbConnect() (*gorm.DB, error) {
 	dsn := config.DConfig.GetDSN()
 	var err error
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		slog.Error("Connect DB fail!", "reason", err)
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 
 func GenerateMsgIDFromContext(ctx *gin.Context) string {
