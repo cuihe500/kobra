@@ -33,10 +33,3 @@ func (r *response) SetSuccess(success bool) {
 		r.Status = "error"
 	}
 }
-
-// Clone get a new response
-// Struct response has methods on both value and pointer receivers. Such usage is not recommended by the Go Documentation.
-// 对于一个Struct体，只需要对指针或者值，二选一即可。
-//func (r response) Clone() Responses {
-//	return &r
-//}

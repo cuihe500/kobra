@@ -1,0 +1,30 @@
+### Register Test
+POST {{baseUrl}}/{{baseApiUri}}/register
+Content-Type: application/json
+
+{
+  "username": "cuihe500",
+  "email": "1337985150@qq.com",
+  "password": "Ch870219176!",
+  "name": "崔昌赫",
+  "age": 24
+}
+
+### Login Test
+POST {{baseUrl}}/{{baseApiUri}}/login
+Content-Type: application/json
+
+{
+  "username": "",
+  "email": "1337985150@qq.com",
+  "password": "Ch870219176!"
+}
+
+### Get All User Info Test
+GET {{baseUrl}}/{{baseApiUri}}/users
+
+### Get User Info By Id Test
+GET {{baseUrl}}/{{baseApiUri}}/user/get/id/1
+
+### What I Want To Say
+GET {{baseUrl}}/{{baseApiUri}}/what-i-want-to-say
