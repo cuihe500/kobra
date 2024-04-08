@@ -7,8 +7,7 @@ import (
 )
 
 type RuntimeEnv struct {
-	db *gorm.DB
-	//context *gin.Context
+	db     *gorm.DB
 	engine *gin.Engine
 }
 

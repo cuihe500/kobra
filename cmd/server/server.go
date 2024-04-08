@@ -73,9 +73,6 @@ func initRouters() {
 }
 
 func startMainServer() {
-	//engine := gin.New()
-	//middleware.InitMiddleware(engine)
-	//routers.Get(engine)
 	srv := &http.Server{
 		Addr:    config2.SConfig.Host + ":" + config2.SConfig.Port,
 		Handler: app.Env.Engine(),
