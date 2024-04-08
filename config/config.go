@@ -18,8 +18,14 @@ type DatabaseConfig struct {
 	DatabaseName string
 }
 
-var SConfig ServerConfig
-var DConfig DatabaseConfig
+type LogLevelConfig struct {
+	DefaultLogLevel  string
+	DatabaseLogLevel string
+}
+
+var ServerConf ServerConfig
+var DatabaseConf DatabaseConfig
+var LogLevelConf LogLevelConfig
 
 func init() {
 	viper.AddConfigPath("$HOME/.kobra_config")
@@ -27,6 +33,9 @@ func init() {
 	viper.SetConfigType("toml")
 	viper.SetDefault("server.host", "0.0.0.0")
 	viper.SetDefault("server.port", "8000")
+	viper.SetDefault("loglevel.default", "info")
+	viper.SetDefault("loglevel.database", "info")
+	viper.SetDefault("global.mode", "development")
 
 	err := viper.BindEnv("server_host", "KOBRA_SERVER_HOST")
 	if err != nil {
@@ -55,6 +64,14 @@ func init() {
 	err6 := viper.BindEnv("database.database_name", "KOBRA_DATABASE_DATABASE_NAME")
 	if err6 != nil {
 		slog.Error("Bind ENV Variable KOBRA_DATABASE_DATABASE_NAME Failed!", "reason", err6)
+	}
+	err7 := viper.BindEnv("loglevel.default", "KOBRA_LOGLEVEL_DEFAULT")
+	if err7 != nil {
+		slog.Error("Bind ENV Variable KOBRA_LOGLEVEL_DEFAULT Failed!", "reason", err7)
+	}
+	err8 := viper.BindEnv("loglevel.database", "KOBRA_LOGLEVEL_DATABASE")
+	if err8 != nil {
+		slog.Error("Bind ENV Variable KOBRA_LOGLEVEL_DATABASE Failed!", "reason", err7)
 	}
 }
 

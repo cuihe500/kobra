@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	sloggin "github.com/samber/slog-gin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/app"
@@ -21,6 +22,7 @@ import (
 var (
 	config string
 	merge  bool
+	logger *slog.Logger
 	SvrCmd = &cobra.Command{
 		Use:   "server",
 		Long:  "Start a new kobra service.",
@@ -40,6 +42,10 @@ func startServer() {
 
 	slog.Info("Start loading configuration file...")
 	parseConfig(config)
+
+	logger = tools.GetDefaultLogger()
+	slog.SetDefault(logger)
+
 	slog.Info("Start connect database...")
 	initDBConnect()
 	slog.Info("Init kobra service...")
@@ -54,8 +60,37 @@ func startServer() {
 	startMainServer()
 }
 
+func parseConfig(path string) {
+
+	viper.SetConfigFile(path)
+
+	if err := viper.ReadInConfig(); err != nil {
+		slog.Error("Parse config file failed!", "reason", err)
+	}
+
+	config2.ServerConf = config2.ServerConfig{
+		Host: viper.GetString("server.host"),
+		Port: viper.GetString("server.port"),
+	}
+	config2.DatabaseConf = config2.DatabaseConfig{
+		Host:         viper.GetString("database.host"),
+		Port:         viper.GetString("database.port"),
+		Username:     viper.GetString("database.username"),
+		Password:     viper.GetString("database.password"),
+		DatabaseName: viper.GetString("database.database_name"),
+	}
+	config2.LogLevelConf = config2.LogLevelConfig{
+		DefaultLogLevel:  viper.GetString("loglevel.default"),
+		DatabaseLogLevel: viper.GetString("loglevel.database"),
+	}
+}
+
 func initGinServer() {
+	if viper.GetString("global.mode") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	engine := gin.New()
+	engine.Use(sloggin.New(logger))
 	app.Env.SetEngine(engine)
 }
 
@@ -74,7 +109,7 @@ func initRouters() {
 
 func startMainServer() {
 	srv := &http.Server{
-		Addr:    config2.SConfig.Host + ":" + config2.SConfig.Port,
+		Addr:    config2.ServerConf.Host + ":" + config2.ServerConf.Port,
 		Handler: app.Env.Engine(),
 	}
 	go func() {
@@ -84,15 +119,15 @@ func startMainServer() {
 			os.Exit(1)
 		}
 	}()
-	slog.Info("Server started!Address:" + config2.SConfig.GetServerAddress())
+	slog.Info("Server started!Address:" + config2.ServerConf.GetServerAddress())
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	slog.Info("Server shutting down...")
 	if err := srv.Shutdown(ctx); err != nil {
-		slog.Error("Server shutdown error!", "reason", err)
+		slog.Error("Server shutdown error!", "reason", err.Error())
 	}
 	select {
 	case <-ctx.Done():
@@ -102,26 +137,6 @@ func startMainServer() {
 
 }
 
-func parseConfig(path string) {
-
-	viper.SetConfigFile(path)
-
-	if err := viper.ReadInConfig(); err != nil {
-		slog.Error("Parse config file failed!", "reason", err)
-	}
-
-	config2.SConfig = config2.ServerConfig{
-		Host: viper.GetString("server.host"),
-		Port: viper.GetString("server.port"),
-	}
-	config2.DConfig = config2.DatabaseConfig{
-		Host:         viper.GetString("database.host"),
-		Port:         viper.GetString("database.port"),
-		Username:     viper.GetString("database.username"),
-		Password:     viper.GetString("database.password"),
-		DatabaseName: viper.GetString("database.database_name"),
-	}
-}
 func mergeDatabase() {
 	db := app.Env.DB()
 	err := db.AutoMigrate(&models.User{})
