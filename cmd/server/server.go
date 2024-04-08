@@ -123,7 +123,7 @@ func startMainServer() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	slog.Info("Server shutting down...")
 	if err := srv.Shutdown(ctx); err != nil {

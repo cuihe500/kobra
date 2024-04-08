@@ -15,8 +15,8 @@ POST {{baseUrl}}/{{baseApiUri}}/login
 Content-Type: application/json
 
 {
-  "username": "",
-  "email": "1337985150@qq.com",
+  "username": "cuihe500",
+  "email": "",
   "password": "Ch870219176!"
 }
 

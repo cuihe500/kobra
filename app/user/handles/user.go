@@ -5,8 +5,8 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/app"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/models"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/models/dto"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/pkg/response"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/tools"
 	"gorm.io/gorm"
 	"log/slog"
 	"strconv"
@@ -23,12 +23,8 @@ func GetAllUserInfo(c *gin.Context) {
 func GetUserInfoById(c *gin.Context) {
 	db := app.Env.DB()
 	id := c.Param("id")
-	if id == "" {
-		response.Error(c, 400, "传入参数id为空！", nil)
-		return
-	}
 	if id, err := strconv.Atoi(id); err != nil || id <= 0 {
-		response.Error(c, 400, "传入参数错误！", nil)
+		response.Error(c, 400, "", nil)
 		return
 	}
 	user := &models.User{}
@@ -46,18 +42,15 @@ func GetUserInfoById(c *gin.Context) {
 
 func Login(c *gin.Context) {
 	db := app.Env.DB()
-	var userLoginDto = &dto.UserLoginDto{}
-	if err := c.ShouldBind(userLoginDto); err != nil ||
-		(userLoginDto.Email == "" && userLoginDto.Username == "") ||
-		(userLoginDto.Email != "" && userLoginDto.Username != "") ||
-		userLoginDto.Password == "" {
-		slog.Error("绑定并验证用户登录信息模型错误！", "errorMsg", err)
-		response.Error(c, 400, "传入参数错误！", err)
+	u := &models.User{}
+	if err := c.ShouldBind(u); err != nil {
+		slog.Error("绑定用户登录信息模型错误！", "reason", err)
+		response.Error(c, 400, "", err)
 		return
 	}
 	user := &models.User{}
-	if userLoginDto.Username != "" {
-		if err := db.Where("username = ?", userLoginDto.Username).First(user).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if u.Username != "" {
+		if err := db.Where("username = ?", u.Username).First(user).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Error("通过用户名查找用户账号信息错误！", "reason", err)
 			response.Error(c, 500, "", err)
 			return
@@ -65,8 +58,13 @@ func Login(c *gin.Context) {
 			response.Error(c, 404, "用户不存在！请检查用户名是否正确！", err)
 			return
 		} else {
-			if user.Password == userLoginDto.Password {
-				response.Success(c, "", "登录成功！")
+			if u.Password == user.Password {
+				jwt, err := tools.GenerateNewJwtToken(user.UUID, user.Username)
+				if err != nil {
+					response.Error(c, 500, "", err)
+					return
+				}
+				response.Success(c, jwt, "登录成功！")
 				return
 			} else {
 				response.Error(c, 401, "用户名或密码错误！", nil)
@@ -74,8 +72,8 @@ func Login(c *gin.Context) {
 			}
 		}
 	}
-	if userLoginDto.Email != "" {
-		if err := db.Where("email = ?", userLoginDto.Email).First(user).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if u.Email != "" {
+		if err := db.Where("email = ?", u.Email).First(user).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Error("通过邮箱查找用户账号信息错误！", "reason", err)
 			response.Error(c, 500, "", err)
 			return
@@ -83,8 +81,13 @@ func Login(c *gin.Context) {
 			response.Error(c, 404, "用户不存在！请检查用户名是否正确！", err)
 			return
 		} else {
-			if user.Password == userLoginDto.Password {
-				response.Success(c, "", "登录成功！")
+			if u.Password == user.Password {
+				jwt, err := tools.GenerateNewJwtToken(user.UUID, user.Username)
+				if err != nil {
+					response.Error(c, 500, "", err)
+					return
+				}
+				response.Success(c, jwt, "登录成功！")
 				return
 			} else {
 				response.Error(c, 401, "用户名或密码错误！", nil)
@@ -97,14 +100,12 @@ func Login(c *gin.Context) {
 
 func Register(c *gin.Context) {
 	db := app.Env.DB()
-	var userRegisterDto = &dto.UserRegisterDto{}
-	if err := c.ShouldBind(userRegisterDto); err != nil ||
-		(userRegisterDto.Email == "" || userRegisterDto.Username == "" || userRegisterDto.Password == "") {
-		slog.Error("绑定并验证用户注册信息模型错误！", "errorMes", err)
+	user := &models.User{}
+	if err := c.ShouldBind(user); err != nil {
+		slog.Error("绑定用户注册信息模型错误！", "reason", err)
 		response.Error(c, 400, "传入参数错误！", err)
 		return
 	}
-	user := (&models.User{}).CreateNewUserModel(userRegisterDto)
 	if err := db.Create(user).Error; err != nil {
 		slog.Error("存储新的用户账号信息错误！", "reason", err)
 		response.Error(c, 500, "", err)

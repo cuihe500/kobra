@@ -1,24 +1,25 @@
 package models
 
 import (
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/models/dto"
+	"github.com/google/uuid"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/tools"
 	"gorm.io/gorm"
 )
 
 type User struct {
 	gorm.Model
-	Email    string
-	Username string
-	Password string
-	Name     string
-	Age      uint
+	UUID     uuid.UUID `gorm:"primary_key;comment:用户唯一标识符" validate:"required,uuid"`
+	Email    string    `gorm:"unique;comment:用户ID" validate:"required,email"`
+	Username string    `gorm:"unique;comment:用户名" validate:"required,min=5,max=32"`
+	Password string    `gorm:"unique;comment:用户密码" validate:"required,min=8,max=128"`
+	Name     string    `gorm:"comment:用户姓名" validate:"omitempty,min=0,max=32"`
+	Age      uint8     `gorm:"comment:用户姓名" validate:"omitempty,min=0,max=100"`
 }
 
-func (user *User) CreateNewUserModel(dto *dto.UserRegisterDto) *User {
-	user.Username = dto.Username
-	user.Password = dto.Password
-	user.Name = dto.Name
-	user.Email = dto.Email
-	user.Age = dto.Age
-	return user
+func (user *User) BeforeCreate(*gorm.DB) (err error) {
+	user.UUID = uuid.New()
+	if err := tools.ValidateData(user); err != nil {
+		return err
+	}
+	return
 }
