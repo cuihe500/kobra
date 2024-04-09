@@ -23,9 +23,17 @@ type LogLevelConfig struct {
 	DatabaseLogLevel string
 }
 
+type RedisConfig struct {
+	Host     string
+	Port     string
+	Password string
+	DB       int
+}
+
 var ServerConf ServerConfig
 var DatabaseConf DatabaseConfig
 var LogLevelConf LogLevelConfig
+var RedisConf RedisConfig
 
 func init() {
 	viper.AddConfigPath("$HOME/.kobra_config")
@@ -36,6 +44,10 @@ func init() {
 	viper.SetDefault("loglevel.default", "info")
 	viper.SetDefault("loglevel.database", "info")
 	viper.SetDefault("global.mode", "development")
+	viper.SetDefault("redis.host", "127.0.0.1")
+	viper.SetDefault("redis.port", "6379")
+	viper.SetDefault("redis.password", "")
+	viper.SetDefault("redis.db", "0")
 
 	err := viper.BindEnv("server_host", "KOBRA_SERVER_HOST")
 	if err != nil {
@@ -71,7 +83,23 @@ func init() {
 	}
 	err8 := viper.BindEnv("loglevel.database", "KOBRA_LOGLEVEL_DATABASE")
 	if err8 != nil {
-		slog.Error("Bind ENV Variable KOBRA_LOGLEVEL_DATABASE Failed!", "reason", err7)
+		slog.Error("Bind ENV Variable KOBRA_LOGLEVEL_DATABASE Failed!", "reason", err8)
+	}
+	err9 := viper.BindEnv("redis.host", "KOBRA_REDIS_HOST")
+	if err9 != nil {
+		slog.Error("Bind ENV Variable KOBRA_REDIS_HOST Failed!", "reason", err9)
+	}
+	err10 := viper.BindEnv("redis.port", "KOBRA_REDIS_PORT")
+	if err10 != nil {
+		slog.Error("Bind ENV Variable KOBRA_REDIS_PORT Failed!", "reason", err10)
+	}
+	err11 := viper.BindEnv("redis.password", "KOBRA_REDIS_PASSWORD")
+	if err11 != nil {
+		slog.Error("Bind ENV Variable KOBRA_REDIS_PASSWORD Failed!", "reason", err11)
+	}
+	err12 := viper.BindEnv("redis.db", "KOBRA_REDIS_DB")
+	if err12 != nil {
+		slog.Error("Bind ENV Variable KOBRA_REDIS_DB Failed!", "reason", err12)
 	}
 }
 

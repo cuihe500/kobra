@@ -3,12 +3,14 @@ package kobra
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 type RuntimeEnv struct {
 	db     *gorm.DB
 	engine *gin.Engine
+	redis  *redis.Client
 }
 
 var Env = &RuntimeEnv{}
@@ -27,6 +29,12 @@ func (env *RuntimeEnv) Engine() *gin.Engine {
 
 func (env *RuntimeEnv) SetEngine(engine *gin.Engine) {
 	env.engine = engine
+}
+func (env *RuntimeEnv) SetRedis(redis *redis.Client) {
+	env.redis = redis
+}
+func (env *RuntimeEnv) Redis() *redis.Client {
+	return env.redis
 }
 
 func GetRuntimeEnv() (*RuntimeEnv, error) {

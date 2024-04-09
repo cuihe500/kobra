@@ -7,16 +7,21 @@ import (
 )
 
 func init() {
-	Routers = append(Routers, GetAllUserRouter)
+	Routers = append(Routers, SetRouter)
+	NoAuthenticationRouters = append(NoAuthenticationRouters, SetNoAuthenticationRouter)
 }
 
-func GetAllUserRouter(router *gin.RouterGroup) {
+func SetNoAuthenticationRouter(router *gin.RouterGroup) {
 	router.
-		GET("/users", handles.GetAllUserInfo).
-		GET("/user/get/id/:id", handles.GetUserInfoById).
 		GET("/what-i-want-to-say", func(ctx *gin.Context) {
 			ctx.String(http.StatusOK, "Written for love and peace.\nBest wishes to you Xu QianQian.")
 		}).
 		POST("/login", handles.Login).
 		POST("/register", handles.Register)
+}
+
+func SetRouter(router *gin.RouterGroup, auth gin.HandlerFunc) {
+	router.
+		GET("/users", auth, handles.GetAllUserInfo).
+		GET("/user/get/id/:id", auth, handles.GetUserInfoById)
 }

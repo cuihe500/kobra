@@ -15,3 +15,9 @@ database_name = "users"
 [loglevel]
 default = "info"
 database = "info"
+
+[redis]
+host = "192.168.125.112"
+port = 46379
+password = ""
+db = 0

@@ -48,6 +48,9 @@ func startServer() {
 
 	slog.Info("Start connect database...")
 	initDBConnect()
+	slog.Info("Start connect Redis...")
+	initRedisConnect()
+
 	slog.Info("Init kobra service...")
 	if merge {
 		slog.Info("Start init database and merge it...")
@@ -66,6 +69,7 @@ func parseConfig(path string) {
 
 	if err := viper.ReadInConfig(); err != nil {
 		slog.Error("Parse config file failed!", "reason", err)
+		return
 	}
 
 	config2.ServerConf = config2.ServerConfig{
@@ -82,6 +86,12 @@ func parseConfig(path string) {
 	config2.LogLevelConf = config2.LogLevelConfig{
 		DefaultLogLevel:  viper.GetString("loglevel.default"),
 		DatabaseLogLevel: viper.GetString("loglevel.database"),
+	}
+	config2.RedisConf = config2.RedisConfig{
+		Host:     viper.GetString("redis.host"),
+		Port:     viper.GetString("redis.port"),
+		Password: viper.GetString("redis.password"),
+		DB:       viper.GetInt("redis.db"),
 	}
 }
 
@@ -105,6 +115,7 @@ func initDBConnect() {
 
 func initRouters() {
 	routers.SetupRouter(kobra.Env.Engine())
+	routers.SetupNoAuthenticationRouter(kobra.Env.Engine())
 }
 
 func startMainServer() {
@@ -144,4 +155,12 @@ func mergeDatabase() {
 		slog.Error("Init and merge database failed!", "reason", err)
 		os.Exit(1)
 	}
+}
+func initRedisConnect() {
+	rdb, err := tools2.GetRedisConnect()
+	if err != nil {
+		slog.Error("Init Redis Connection Failed!", "reason", err)
+		os.Exit(1)
+	}
+	kobra.Env.SetRedis(rdb)
 }

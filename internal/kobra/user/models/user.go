@@ -24,10 +24,10 @@ func (user *User) BeforeCreate(*gorm.DB) (err error) {
 		return err
 	}
 	db := kobra.Env.DB()
-	if err := db.Where(user.Email).Find(&User{}).Error; err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := db.Where(user.Email).Find(&User{}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("该邮箱已存在！")
 	}
-	if err := db.Where(user.Username).Find(&User{}).Error; err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := db.Where(user.Username).Find(&User{}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("该用户名已存在！")
 	}
 	return

@@ -6,5 +6,4 @@ type Responses interface {
 	SetMeg(string)
 	SetData(interface{})
 	SetSuccess(bool)
-	Clone() Responses
 }
