@@ -7,11 +7,11 @@ import (
 	sloggin "github.com/samber/slog-gin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/models"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/routers"
-	config2 "gitlab.eaip.top/gorm-gen-gin-learn-project/config"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/tools"
+	config2 "gitlab.eaip.top/gorm-gen-gin-learn-project/internal/config"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/user/models"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/user/routers"
+	tools2 "gitlab.eaip.top/gorm-gen-gin-learn-project/internal/tools"
 	"log/slog"
 	"net/http"
 	"os"
@@ -43,7 +43,7 @@ func startServer() {
 	slog.Info("Start loading configuration file...")
 	parseConfig(config)
 
-	logger = tools.GetDefaultLogger()
+	logger = tools2.GetDefaultLogger()
 	slog.SetDefault(logger)
 
 	slog.Info("Start connect database...")
@@ -91,26 +91,26 @@ func initGinServer() {
 	}
 	engine := gin.New()
 	engine.Use(sloggin.New(logger))
-	app.Env.SetEngine(engine)
+	kobra.Env.SetEngine(engine)
 }
 
 func initDBConnect() {
-	db, err := tools.GetDbConnect()
+	db, err := tools2.GetDbConnect()
 	if err != nil {
 		slog.Error("Create DB Connection Failed!", "reason", err)
 		os.Exit(1)
 	}
-	app.Env.SetDB(db)
+	kobra.Env.SetDB(db)
 }
 
 func initRouters() {
-	routers.SetupRouter(app.Env.Engine())
+	routers.SetupRouter(kobra.Env.Engine())
 }
 
 func startMainServer() {
 	srv := &http.Server{
 		Addr:    config2.ServerConf.Host + ":" + config2.ServerConf.Port,
-		Handler: app.Env.Engine(),
+		Handler: kobra.Env.Engine(),
 	}
 	go func() {
 		err := srv.ListenAndServe()
@@ -138,7 +138,7 @@ func startMainServer() {
 }
 
 func mergeDatabase() {
-	db := app.Env.DB()
+	db := kobra.Env.DB()
 	err := db.AutoMigrate(&models.User{})
 	if err != nil {
 		slog.Error("Init and merge database failed!", "reason", err)

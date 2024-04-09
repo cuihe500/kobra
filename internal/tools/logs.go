@@ -3,7 +3,7 @@ package tools
 import (
 	slogGorm "github.com/orandin/slog-gorm"
 	"github.com/phsym/console-slog"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/config"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/config"
 	gormLogger "gorm.io/gorm/logger"
 	"log/slog"
 	"os"

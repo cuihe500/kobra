@@ -3,7 +3,7 @@ package version
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/common"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/common"
 )
 
 var VCmd = &cobra.Command{

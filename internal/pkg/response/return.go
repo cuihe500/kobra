@@ -2,7 +2,7 @@ package response
 
 import (
 	"github.com/gin-gonic/gin"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/tools"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/tools"
 	"net/http"
 )
 

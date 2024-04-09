@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/config"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

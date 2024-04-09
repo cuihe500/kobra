@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/handles"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/user/handles"
 	"net/http"
 )
 

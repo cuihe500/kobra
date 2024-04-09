@@ -3,17 +3,17 @@ package handles
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/app/user/models"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/pkg/response"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/tools"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/user/models"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/pkg/response"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/tools"
 	"gorm.io/gorm"
 	"log/slog"
 	"strconv"
 )
 
 func GetAllUserInfo(c *gin.Context) {
-	db := app.Env.DB()
+	db := kobra.Env.DB()
 	users := &[]models.User{}
 	db.Find(users)
 	response.Success(c, users, "查询成功！")
@@ -21,7 +21,7 @@ func GetAllUserInfo(c *gin.Context) {
 }
 
 func GetUserInfoById(c *gin.Context) {
-	db := app.Env.DB()
+	db := kobra.Env.DB()
 	id := c.Param("id")
 	if id, err := strconv.Atoi(id); err != nil || id <= 0 {
 		response.Error(c, 400, "", nil)
@@ -41,7 +41,7 @@ func GetUserInfoById(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	db := app.Env.DB()
+	db := kobra.Env.DB()
 	u := &models.User{}
 	if err := c.ShouldBind(u); err != nil {
 		slog.Error("绑定用户登录信息模型错误！", "reason", err)
@@ -99,7 +99,7 @@ func Login(c *gin.Context) {
 }
 
 func Register(c *gin.Context) {
-	db := app.Env.DB()
+	db := kobra.Env.DB()
 	user := &models.User{}
 	if err := c.ShouldBind(user); err != nil {
 		slog.Error("绑定用户注册信息模型错误！", "reason", err)
