@@ -3,8 +3,9 @@ package handles
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/common"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/user/models"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/models"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/pkg/response"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/tools"
 	"gorm.io/gorm"
@@ -12,6 +13,18 @@ import (
 	"strconv"
 	"time"
 )
+
+func init() {
+	kobra.Authentications = append(kobra.Authentications, kobra.Authentication{
+		Role:   "admin",
+		Path:   common.APIVersion + "/users",
+		Method: []string{"GET"},
+	}, kobra.Authentication{
+		Role:   "admin",
+		Path:   common.APIVersion + "/user" + "/get" + "/id" + "/*",
+		Method: []string{"GET", "POST"},
+	})
+}
 
 func GetAllUserInfo(c *gin.Context) {
 	db := kobra.Env.DB()

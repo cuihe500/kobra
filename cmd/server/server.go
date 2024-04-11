@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	config2 "gitlab.eaip.top/gorm-gen-gin-learn-project/internal/config"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/user/models"
-	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/user/routers"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/models"
+	routers2 "gitlab.eaip.top/gorm-gen-gin-learn-project/internal/kobra/routers"
 	tools2 "gitlab.eaip.top/gorm-gen-gin-learn-project/internal/tools"
 	"log/slog"
 	"net/http"
@@ -53,6 +53,9 @@ func startServer() {
 
 	slog.Info("Init RBAC Casbin...")
 	initCasbin()
+
+	slog.Info("Init Authentication Path...")
+	initAuthentication()
 
 	slog.Info("Init kobra service...")
 	if merge {
@@ -125,8 +128,8 @@ func initDBConnect() {
 }
 
 func initRouters() {
-	routers.SetupRouter(kobra.Env.Engine())
-	routers.SetupNoAuthenticationRouter(kobra.Env.Engine())
+	routers2.SetupRouter(kobra.Env.Engine())
+	routers2.SetupNoAuthenticationRouter(kobra.Env.Engine())
 }
 
 func startMainServer() {
@@ -180,5 +183,16 @@ func initCasbin() {
 	tools2.Enforcer, err = tools2.CasbinEnforcer()
 	if err != nil {
 		slog.Error("初始化Casbin失败！", "reason", err)
+		os.Exit(1)
+	}
+}
+
+func initAuthentication() {
+	for _, v := range kobra.Authentications {
+		_, err := tools2.Enforcer.AddPolicy(v.GetCasbinAuthenticationConfig())
+		if err != nil {
+			slog.Error("增加权限验证错误！", "reason", err, "authPath", v.GetCasbinAuthenticationConfig())
+			os.Exit(1)
+		}
 	}
 }

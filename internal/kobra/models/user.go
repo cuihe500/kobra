@@ -13,7 +13,7 @@ type User struct {
 	UUID     uuid.UUID `gorm:"primary_key;comment:用户唯一标识符" validate:"required,uuid"`
 	Email    string    `gorm:"unique;comment:用户ID" validate:"required,email"`
 	Username string    `gorm:"unique;comment:用户名" validate:"required,min=5,max=32"`
-	Password string    `gorm:"unique;comment:用户密码" validate:"required,min=8,max=128"`
+	Password string    `gorm:"comment:用户密码" validate:"required,min=8,max=128"`
 	Name     string    `gorm:"comment:用户姓名" validate:"omitempty,min=0,max=32"`
 	Age      uint8     `gorm:"comment:用户姓名" validate:"omitempty,min=0,max=100"`
 }
@@ -30,5 +30,12 @@ func (user *User) BeforeCreate(*gorm.DB) (err error) {
 	if err := db.Where("username = ?", user.Username).Find(&User{}).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("该用户名已存在！")
 	}
-	return
+	return nil
+}
+func (user *User) AfterCreate(*gorm.DB) (err error) {
+	_, err = tools.Enforcer.AddRoleForUser(user.UUID.String(), "user")
+	if err != nil {
+		return errors.New("添加用户角色信息错误！")
+	}
+	return nil
 }

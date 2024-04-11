@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/common"
 	"gitlab.eaip.top/gorm-gen-gin-learn-project/internal/middleware"
 )
 
@@ -14,11 +15,11 @@ var NoAuthenticationRouters = make([]func(v1 *gin.RouterGroup), 0)
 
 func SetupRouter(engine *gin.Engine) {
 	for _, r := range Routers {
-		r(engine.Group("/api/v1"), middleware.Authentication())
+		r(engine.Group(common.APIVersion), middleware.Authentication())
 	}
 }
 func SetupNoAuthenticationRouter(engine *gin.Engine) {
 	for _, r := range NoAuthenticationRouters {
-		r(engine.Group("/api/v1"))
+		r(engine.Group(common.APIVersion))
 	}
 }
