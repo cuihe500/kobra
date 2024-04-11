@@ -30,10 +30,20 @@ type RedisConfig struct {
 	DB       int
 }
 
+type CasbinConfig struct {
+	Host              string
+	Port              string
+	Username          string
+	Password          string
+	DatabaseName      string
+	RBACModelFilePath string
+}
+
 var ServerConf ServerConfig
 var DatabaseConf DatabaseConfig
 var LogLevelConf LogLevelConfig
 var RedisConf RedisConfig
+var CasbinConf CasbinConfig
 
 func init() {
 	viper.AddConfigPath("$HOME/.kobra_config")
@@ -48,6 +58,17 @@ func init() {
 	viper.SetDefault("redis.port", "6379")
 	viper.SetDefault("redis.password", "")
 	viper.SetDefault("redis.db", "0")
+	viper.SetDefault("database.host", "127.0.0.1")
+	viper.SetDefault("database.port", "3306")
+	viper.SetDefault("database.username", "root")
+	viper.SetDefault("database.password", "123456")
+	viper.SetDefault("database.database_name", "users")
+	viper.SetDefault("rbac.host", "127.0.0.1")
+	viper.SetDefault("rbac.port", "3306")
+	viper.SetDefault("rbac.username", "root")
+	viper.SetDefault("rbac.password", "123456")
+	viper.SetDefault("rbac.database_name", "casbin")
+	viper.SetDefault("rbac.rbac_model_filepath", "config/rbac_model.conf")
 
 	err := viper.BindEnv("server_host", "KOBRA_SERVER_HOST")
 	if err != nil {
@@ -101,6 +122,30 @@ func init() {
 	if err12 != nil {
 		slog.Error("Bind ENV Variable KOBRA_REDIS_DB Failed!", "reason", err12)
 	}
+	err13 := viper.BindEnv("rbac.host", "KOBRA_RBAC_HOST")
+	if err13 != nil {
+		slog.Error("Bind ENV Variable KOBRA_RBAC_HOST Failed!", "reason", err13)
+	}
+	err14 := viper.BindEnv("rbac.port", "KOBRA_RBAC_PORT")
+	if err14 != nil {
+		slog.Error("Bind ENV Variable KOBRA_RBAC_PORT Failed!", "reason", err14)
+	}
+	err15 := viper.BindEnv("rbac.username", "KOBRA_RBAC_USERNAME")
+	if err15 != nil {
+		slog.Error("Bind ENV Variable KOBRA_RBAC_USERNAME Failed!", "reason", err15)
+	}
+	err16 := viper.BindEnv("rbac.password", "KOBRA_RBAC_PASSWORD")
+	if err16 != nil {
+		slog.Error("Bind ENV Variable KOBRA_RBAC_PASSWORD Failed!", "reason", err16)
+	}
+	err17 := viper.BindEnv("rbac.database_name", "KOBRA_RBAC_DATABASE_NAME")
+	if err17 != nil {
+		slog.Error("Bind ENV Variable KOBRA_RBAC_DATABASE_NAME Failed!", "reason", err17)
+	}
+	err18 := viper.BindEnv("rbac.rbac_model_filepath", "KOBRA_RBAC_MODEL_FILEPATH")
+	if err18 != nil {
+		slog.Error("Bind ENV Variable KOBRA_RBAC_MODEL_FILEPATH Failed!", "reason", err18)
+	}
 }
 
 func (config ServerConfig) GetServerAddress() string {
@@ -108,5 +153,8 @@ func (config ServerConfig) GetServerAddress() string {
 }
 
 func (config DatabaseConfig) GetDSN() string {
+	return config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + config.Port + ")/" + config.DatabaseName + "?charset=utf8mb4&parseTime=True&loc=Local"
+}
+func (config CasbinConfig) GetRbacDSN() string {
 	return config.Username + ":" + config.Password + "@tcp(" + config.Host + ":" + config.Port + ")/" + config.DatabaseName + "?charset=utf8mb4&parseTime=True&loc=Local"
 }

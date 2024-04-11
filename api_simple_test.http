@@ -25,6 +25,7 @@ GET {{baseUrl}}/{{baseApiUri}}/users
 
 ### Get User Info By Id Test
 GET {{baseUrl}}/{{baseApiUri}}/user/get/id/1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImUwOGMzYWE0LTRhMmUtNDAxMi05MjU5LTFhNjk3NWRlMjdiOSIsImlzcyI6ImtvYnJhIiwic3ViIjoidXNlcnMiLCJhdWQiOlsiY3VpaGU1MDAiXSwiZXhwIjoxNzEyODQ5MTY1LCJuYmYiOjE3MTI4MzgzNjUsImlhdCI6MTcxMjgzODM2NX0.2_fndFP1P_ypM3iUlyu6l_UEODs3N59zAd9ZK46_BQk
 
 ### What I Want To Say
 GET {{baseUrl}}/{{baseApiUri}}/what-i-want-to-say

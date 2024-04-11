@@ -8,10 +8,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetDbConnect() (*gorm.DB, error) {
+func DbConnect() (*gorm.DB, error) {
 	dsn := config.DatabaseConf.GetDSN()
 	gormLoggerLevel := getDatabaseLogLevel()
-	var err error
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: gormLoggerLevel,
 	})
@@ -21,7 +20,7 @@ func GetDbConnect() (*gorm.DB, error) {
 	return db, nil
 }
 
-func GetRedisConnect() (*redis.Client, error) {
+func RedisConnect() (*redis.Client, error) {
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     config.RedisConf.Host + ":" + config.RedisConf.Port,

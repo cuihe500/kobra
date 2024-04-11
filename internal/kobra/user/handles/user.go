@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"log/slog"
 	"strconv"
+	"time"
 )
 
 func GetAllUserInfo(c *gin.Context) {
@@ -64,6 +65,8 @@ func Login(c *gin.Context) {
 					response.Error(c, 500, "", err)
 					return
 				}
+				redis := kobra.Env.Redis()
+				redis.Set(c, user.UUID.String(), jwt, time.Hour*3)
 				response.Success(c, jwt, "登录成功！")
 				return
 			} else {

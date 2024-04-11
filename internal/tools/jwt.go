@@ -52,7 +52,7 @@ func ValidateAndParseJwtToken(tokenString string) (*Token, error) {
 		return nil, errors.New("该Token未验证！")
 	}
 	if token, ok := tk.Claims.(*Token); !ok {
-		slog.Error("该")
+		slog.Error("该Token转换错误！", "reason", err)
 		return nil, errors.New("转换Token错误！")
 	} else {
 		return token, nil

@@ -51,6 +51,9 @@ func startServer() {
 	slog.Info("Start connect Redis...")
 	initRedisConnect()
 
+	slog.Info("Init RBAC Casbin...")
+	initCasbin()
+
 	slog.Info("Init kobra service...")
 	if merge {
 		slog.Info("Start init database and merge it...")
@@ -93,6 +96,14 @@ func parseConfig(path string) {
 		Password: viper.GetString("redis.password"),
 		DB:       viper.GetInt("redis.db"),
 	}
+	config2.CasbinConf = config2.CasbinConfig{
+		Host:              viper.GetString("rbac.host"),
+		Port:              viper.GetString("rbac.port"),
+		Username:          viper.GetString("rbac.username"),
+		Password:          viper.GetString("rbac.password"),
+		DatabaseName:      viper.GetString("rbac.database_name"),
+		RBACModelFilePath: viper.GetString("rbac.rbac_model_file"),
+	}
 }
 
 func initGinServer() {
@@ -105,7 +116,7 @@ func initGinServer() {
 }
 
 func initDBConnect() {
-	db, err := tools2.GetDbConnect()
+	db, err := tools2.DbConnect()
 	if err != nil {
 		slog.Error("Create DB Connection Failed!", "reason", err)
 		os.Exit(1)
@@ -157,10 +168,17 @@ func mergeDatabase() {
 	}
 }
 func initRedisConnect() {
-	rdb, err := tools2.GetRedisConnect()
+	rdb, err := tools2.RedisConnect()
 	if err != nil {
 		slog.Error("Init Redis Connection Failed!", "reason", err)
 		os.Exit(1)
 	}
 	kobra.Env.SetRedis(rdb)
+}
+func initCasbin() {
+	var err error
+	tools2.Enforcer, err = tools2.CasbinEnforcer()
+	if err != nil {
+		slog.Error("初始化Casbin失败！", "reason", err)
+	}
 }
